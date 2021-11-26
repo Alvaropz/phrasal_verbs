@@ -38,12 +38,81 @@ def pv_exists(phrasal_verb):
     return fetchedData
 
 # Retrieve data from the database.
-def retrieve():
+def retrieve(*update):
     fetchedData = db.all_data_query()
     pv_retrieved = []
     for row in fetchedData:
         pv_retrieved.append(dict(row))
+        if update:
+            print("{}. {}".format(row['id'], row['phrasal_verb']))
     return pv_retrieved
+
+# Update de data in the database.
+def update():
+    retrieved_data = retrieve(True)
+    id_chosen = input("Type the 'id' number you want to use to update the data: ")
+    if id_chosen.isdigit():
+        for row in retrieved_data:
+            if row['id'] == int(id_chosen):
+                data = row
+                break
+        print("Now you are modifying '{}'".format(data['phrasal_verb'].upper()))
+        modify_data = modify_this_data('phrasal verb')
+        if modify_data:
+            data['phrasal_verb'] = input('Type your phrasal verb modification: ').strip().lower()
+        modify_data = modify_this_data('explanations')
+        if modify_data:
+            data['explanations'] = modify_explanations_examples(data['explanations'], 'explanation')
+        modify_data = modify_this_data('English exammples')
+        if modify_data:
+            data['english_examples'] = modify_explanations_examples(data['english_examples'], 'example')
+        modify_data = modify_this_data('Spanish equivalent')
+        if modify_data:
+            data['spanish_equivalent'] = input('Type your Spanish equivalent modification: ').strip().capitalize()
+    else:
+        print('Please, type a valid number.')
+    db.update_query(data['id'], data['phrasal_verb'], data['explanations'], data['english_examples'], data['spanish_equivalent'])
+
+def modify_this_data(step):
+    modify_data = ''
+    while modify_data != 'y' or modify_data != 'n':
+        if modify_data == 'y':
+            return True
+        elif modify_data == 'n':
+            return False
+        modify_data = input("Do you want to modify '{}'? 'Y' if you want, 'N' if you don't want to: ".format(step)).strip().lower()
+
+
+def modify_explanations_examples(data_list, type):
+    # Allows to modify the explanations/examples lists by asking if the user wants to modify an existing explanation/exmple and/or adding a new one
+    i = 0
+    while i < len(data_list):
+        change = ''
+        while change != 'y' or change != 'n':
+            if change != 'y':
+                change = input("Do you want to modify/remove '{}'? Type 'Y' for modifying/removing this {}, 'N' to skip: ".format(data_list[i], type)).strip().lower()
+            if change == 'y':
+                modify_remove = input('Do you want or "remove" or "modify" this data? Type "Remove" or "Modify": ').strip().lower()
+                if modify_remove == "remove":
+                    del data_list[i]
+                    i -= 1
+                    break
+                if modify_remove == "modify":
+                    data_list[i] = input('Type your {} modification: '.format(type)).strip().capitalize()
+                    break
+                else:
+                    print("That is not a valid action.")
+            elif change == 'n':
+                break
+        i += 1
+    add_more = ''
+    while add_more != 'y' or add_more != 'n':
+        add_more = input("Do you want add another {0}? Type 'Y' to add another {0}. 'N' to stop adding {0}s: ".format(type)).strip().lower()
+        if add_more == 'y':
+            data_list.append(input('Type your new {}: '.format(type)).strip().capitalize())
+        elif add_more == 'n':
+            break
+    return data_list
 
 # Knowledge test function
 def guess_pv(points, attemps):
@@ -100,11 +169,10 @@ def game():
     if percentage == 100:
         print('Well done! You got 100% score! With a {} of right answers/attemps.'.format(formated_right_attempts))
     elif percentage >= 80:
-        print('Well done! You were close! You got {} score. With a {} of right answers/attemps.'.format(str(percentage) + '%', formated_right_attempts))
+        print('Good job! You were close! You got {} score. With a {} of right answers/attemps.'.format(str(percentage) + '%', formated_right_attempts))
     elif percentage >= 50:
         print('Not bad! You have to keep practicing a bit! You got {} score. With a {} of right answers/attemps.'.format(str(percentage) + '%', formated_right_attempts))
     else:
         print('Oh no! You got {} score. That\'s fewer than 50% of total score, but don\'t worry, you just to practice a bit more! With a {} of right answers/attemps.'.format(str(percentage) + '%', formated_right_attempts))
 
-game()
 db.stop_connection()

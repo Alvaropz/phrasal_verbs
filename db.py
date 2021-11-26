@@ -70,3 +70,9 @@ def pv_exists_query(phrasal_verb):
         return rec['phrasal_verb']
     else:
         return
+
+def update_query(id, pv, expla, engexpl, spaequ):
+    cur = con.cursor()
+    cur.execute("UPDATE phrasalverbs SET phrasal_verb=%s, explanations=%s, english_examples=%s, spanish_equivalent=%s WHERE id=%s", (pv, expla, engexpl, spaequ, id))
+    con.commit()
+    cur.close()

@@ -21,7 +21,7 @@ This project allows a (Spanish speaker) user to improve their knowledge in phras
     *  As *update()* cannot know what column you want to modify, it goes through all of them. So the user can select if they want to modify one or more rows. *modify_this_data()* is a helper function where they program ask the user if the current data (e.g.: "Phrasalverb") has to be modfied, if so, it allows to modify the user that data. 
     *  The function *modify_explanations_examples()* allows to modify, remove or add new explanations and/or examples to their corresponding arrays. First it asks what task wants the user to perform by iterating through the list. When it finishes iterating through the list, the user can add more explanations/examples.
 
-  *  *guess_pv()*: This functions is pretty simple. It retrieves all data from the database, then it randomly selects three options, then it selects a phrasal verb target to guess. If the answer is right, the user gets a point.
+*  *guess_pv()*: This functions is pretty simple. It retrieves all data from the database, then it randomly selects three options, then it selects a phrasal verb target to guess. If the answer is right, the user gets a point.
 
 ## Technologies:
 
